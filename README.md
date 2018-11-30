@@ -36,7 +36,7 @@ sudo apt-get update
 	
 sudo apt-get install docker-ce
 ```
-3. Install [nvidia-docker plugin](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)). Please refer to prerequisites in that link.  
+2. Install [nvidia-docker plugin](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)). Please refer to prerequisites in that link.  
 ```bash
 
 docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
@@ -45,7 +45,29 @@ sudo apt-get purge nvidia-docker
 sudo apt-get install nvidia-docker2
 sudo pkill -SIGHUP dockerd
 ```
+3. Setup environment variables for NVIDIA binaries and libraries. If these variables are not set correct, pointcloud from lidar wont be visible
+```bash
+# find out the version of nvidia drivers installed
+glxinfo | grep "OpenGL core profile version" 
+# output of this should be something similar to 
+# OpenGL core profile version string: 4.5.0 NVIDIA 384.130
+# In this case, the driver version is 384.130
 
+# search for the bin, lib and lib32 directories
+dpkg -L nvidia-384 # change nvidia-384 to the major number of installed version
+# based on the output, relevant directories on my machine are /usr/lib/nvidia-384/bin, /usr/lib/nvidia-384, and /usr/lib32/nvidia-384
+
+# set environment variables in ~/.bashrc. Use output from previous commands to get the correct directory
+export NVIDIA_BIN="/usr/lib/nvidia-384/bin"
+export NVIDIA_LIB="/usr/lib/nvidia-384"
+export NVIDIA_LIB32="/usr/lib32/nvidia-384"
+
+# source ~/.bashrc
+source ~/.bashrc
+
+#(Advanced users modify and source zsh :P)
+
+```
 4. Run the script to build docker image and run the container. Docker needs sudo access by default. If you see an error while running the docker image, use sudo. Refer to [this](https://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo) if you wish to allow docker commands without sudo.
 ```bash
 # clone the repository if you have not done that already
@@ -70,3 +92,24 @@ export ROS_IP=201.1.0.1 # Confirm this from ifconfig results
 ```
 
 7. To stop the docker run `docker stop drcsim`
+
+### Useful Aliases
+```bash
+alias source_dock="export ROS_MASTER_URI=http://201.1.1.10:11311 && \
+                  export ROS_IP=201.1.0.1 # Confirm this from ifconfig results"
+
+export DRCSIM_DOCKER_DIR="~/Documents/drcsim_docker" # change this based on your configuration
+alias start_dock="cd $DRCSIM_DOCKER_DIR && bash runDrcsimDocker.sh"
+alias stop_dock="docker stop drcsim"
+alias gazebo_dock="GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient"
+```
+
+### Troubleshooting
+1. Gazebo client starts fine, but atlas model is missing.    
+**Solution**: You need atlas model resources on local machine to see atlas in gazebo client. Create a new workspace using atlas_gazebo_ws.yaml file and the instructions available (here)[https://github.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/blob/master/atlas_gazebo_ws.yaml]. Run catkin_make install and source install/share/drcsim/setup.sh and start gzclient from that terminal. you can modify the alias given above as `alias gazebo_dock="source ~/drcsim/install/share/drcsim/setup.sh && \
+                   GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient"`
+
+2. Camera and/or lidar topic are not available.
+**Solution**: Follow step 3 in instructions. 
+
+
