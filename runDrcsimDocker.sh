@@ -44,9 +44,9 @@ docker run --rm --name drcsim \
     -e XAUTHORITY=/tmp/.docker.xauth \
     -v "/etc/localtime:/etc/localtime:ro" \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw  --privileged \
-    -v /usr/lib/nvidia-384:/usr/local/nvidia/lib64 \
-    -v /usr/lib/nvidia-384/bin:/usr/local/nvidia/bin \
-    -v /usr/lib32/nvidia-384/:/usr/local/nvidia/lib \
+    -v $NVIDIA_LIB:/usr/local/nvidia/lib64 \
+    -v $NVIDIA_BIN:/usr/local/nvidia/bin \
+    -v $NVIDIA_LIB32:/usr/local/nvidia/lib \
     --device /dev/dri \
     -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
     -v /dev/log:/dev/log \
