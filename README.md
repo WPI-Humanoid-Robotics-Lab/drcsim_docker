@@ -83,11 +83,11 @@ bash runDrcsimDocker.sh
 
 5. Connect gazebo client on host machine (in a new terminal)
 ```bash
-GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient
+GAZEBO_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11345 gzclient
 ```
 6. To run code on docker image export the following variables. You can add these to ~/.bashrc for ease of use.
 ```bash
-export ROS_MASTER_URI=http://201.1.1.10:11311
+export ROS_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11311
 export ROS_IP=201.1.0.1 # Confirm this from ifconfig results
 ```
 
@@ -95,13 +95,13 @@ export ROS_IP=201.1.0.1 # Confirm this from ifconfig results
 
 ### Useful Aliases
 ```bash
-alias source_dock="export ROS_MASTER_URI=http://201.1.1.10:11311 && \
+alias source_dock="export ROS_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11311 && \
                   export ROS_IP=201.1.0.1 # Confirm this from ifconfig results"
 
 export DRCSIM_DOCKER_DIR="~/Documents/drcsim_docker" # change this based on your configuration
 alias start_dock="cd $DRCSIM_DOCKER_DIR && bash runDrcsimDocker.sh"
 alias stop_dock="docker stop drcsim"
-alias gazebo_dock="GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient"
+alias gazebo_dock="GAZEBO_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11345 gzclient"
 ```
 
 ### Troubleshooting
