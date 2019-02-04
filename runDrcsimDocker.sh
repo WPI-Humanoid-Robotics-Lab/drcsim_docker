@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ "$(docker images -q drcsim:gazebo 2> /dev/null)" == "" ]]; then
-  docker build -t drcsim:gazebo .
+if [[ "$(docker images -q drcsim:$UID 2> /dev/null)" == "" ]]; then
+  docker build -t drcsim:$UID .
 fi
 
 if [[ "$(docker network ls | grep docker_bridge 2> /dev/null)" == "" ]]; then
@@ -38,21 +38,25 @@ fi
 
 
 docker run --rm --name drcsim \
-    --runtime=nvidia \
-    -v /etc/localtime:/etc/localtime:ro \
     -e DISPLAY=unix$DISPLAY \
     -e XAUTHORITY=/tmp/.docker.xauth \
-    -v "/etc/localtime:/etc/localtime:ro" \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:rw  --privileged \
+    --privileged \
+    -e ROS_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11311 \
+    -e ROS_IP=201.1.1.10 \
+    --device /dev/dri \
+    -v /etc/localtime:/etc/localtime:ro \
     -v $NVIDIA_LIB:/usr/local/nvidia/lib64 \
     -v $NVIDIA_BIN:/usr/local/nvidia/bin \
     -v $NVIDIA_LIB32:/usr/local/nvidia/lib \
-    --device /dev/dri \
-    -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
     -v /dev/log:/dev/log \
-    -e ROS_MASTER_URI=http://201.1.1.10:11311 \
-    -e ROS_IP=201.1.1.10 \
+    -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+    -v "/etc/localtime:/etc/localtime:ro" \
     --ulimit rtprio=99 \
     --net=docker_bridge\
-    --ip=201.1.1.10 \
-    drcsim:gazebo
+    --ip=201.1.1.`expr $UID - 1000 + 10` \
+    drcsim:$UID
+
+
+
+#    --runtime=nvidia \

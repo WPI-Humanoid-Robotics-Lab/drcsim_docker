@@ -1,9 +1,11 @@
-FROM ros:kinetic-ros-base
+FROM nvidia/cuda:8.0-runtime-ubuntu16.04
+#FROM ros:kinetic-ros-base
 # osrf/ros:kinetic-desktop-full
 LABEL maintainer "vvjagtap@wpi.edu"
 
 SHELL ["/bin/bash", "-c"]
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN cat /etc/resolv.conf
 RUN apt-get -y update && apt-get install -y sudo apt-utils
 
 # Create a user
@@ -21,12 +23,12 @@ ENV HOME /home/whrl
 # Installing general required packages
 
 
-RUN rosdep update 
+
 
 # Install drcsim 
 RUN /bin/bash -c "sudo chown -R whrl:whrl /home/whrl"
 RUN /bin/bash -c "echo 'source /opt/ros/kinetic/setup.bash' >> ~/.bashrc"
-RUN sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 # Install Dependencies 
@@ -47,13 +49,16 @@ RUN  sudo apt-get -y update && sudo apt-get install -y git \
   ros-kinetic-multisense-ros ros-kinetic-robot-self-filter ros-kinetic-octomap \
   ros-kinetic-octomap-msgs ros-kinetic-octomap-ros ros-kinetic-gridmap-2d \
   software-properties-common python-software-properties debconf-i18n \
-  ros-kinetic-stereo-image-proc python-vcstool python-catkin-tools  
+  ros-kinetic-stereo-image-proc python-vcstool python-catkin-tools ros-kinetic-ros-base 
 
-#RUN /bin/bash -c "cd ~/kinetic_ws && ls -al"
+RUN sudo rosdep init
+RUN rosdep update 
+
 # Create a catkin workspace
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
                   mkdir ~/kinetic_ws"
-RUN /bin/bash -c "cd ~/kinetic_ws && catkin config --init --mkdirs && \
+RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
+                  cd ~/kinetic_ws && catkin config --init --mkdirs && \
                   cd src && \
                   wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/master/atlas_gazebo_ws.yaml && \
                   vcs import < atlas_gazebo_ws.yaml && cd .. && \
@@ -109,4 +114,10 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 
+#nvidia-384 installs lightdm that requires a keyboard input. To avoid that popup, copy an existing keyboard layout file
+COPY ./keyboard /etc/default/keyboard
+RUN sudo mkdir -p /usr/lib/nvidia/
+RUN sudo apt-get -y update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install nvidia-384
+
+RUN sudo bash -c 'echo "org.gradle.jvmargs=-Xms4096m -Xmx4096m" > ~/.gradle/gradle.properties'
 CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
