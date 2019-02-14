@@ -103,7 +103,7 @@ export ROS_IP=172.16.232.1 # Confirm this from ifconfig results
 DUID=$((UID%256))
 export IP=${IPADDR:-172.16.$DUID.$DUID}
 alias source_dock="export ROS_MASTER_URI=http://${IP}:11311 && \
-                  export ROS_IP 172.16.232.1" # Confirm this from ifconfig results
+                  export ROS_IP=172.16.232.1" # Confirm this from ifconfig results
 
 export DRCSIM_DOCKER_DIR="~/drcsim_docker" # change this based on your configuration
 alias start_dock="cd $DRCSIM_DOCKER_DIR && bash runDrcsimDocker.sh"
