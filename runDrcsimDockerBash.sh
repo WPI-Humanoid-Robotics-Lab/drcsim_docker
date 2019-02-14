@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
-if [[ "$(docker images -q drcsim:$UID 2> /dev/null)" == "" ]]; then
-  docker build -t drcsim:$UID .
+DUID=$((UID%256))
+IP=${IPADDR:-172.16.$DUID.$DUID}
+
+if [[ "$(docker images -q drcsim:$DUID 2> /dev/null)" == "" ]]; then
+  docker build -t drcsim:$DUID --build-arg ip=$IP .
 fi
 
-if [[ "$(docker network ls | grep docker_bridge 2> /dev/null)" == "" ]]; then
+if [[ "$(docker network ls | grep docker_bridge_$DUID 2> /dev/null)" == "" ]]; then
   echo "creating network bridge for docker image"
-  docker network create --subnet 201.1.1.0/16 --driver bridge docker_bridge
+  docker network create --subnet=172.16.$DUID.0/24 --driver=bridge docker_bridge_$DUID
 fi
 
 echo "running drcsim 0.11 docker container"
@@ -36,13 +39,16 @@ then
   fi
 fi
 
+printf "IP address is $IP \nROS master URI : http://$IP:11311 \nGazebo master URI : http://$IP:11345\n"
 
-docker run --rm --name drcsim \
+docker run --rm --name drcsim_${USER} \
     -e DISPLAY=unix$DISPLAY \
+    --net=docker_bridge_$DUID \
+    --ip=$IP \
     -e XAUTHORITY=/tmp/.docker.xauth \
     --privileged \
-    -e ROS_MASTER_URI=http://201.1.1.`expr $UID - 1000 + 10`:11311 \
-    -e ROS_IP=201.1.1.10 \
+    -e ROS_MASTER_URI=http://$IP:11311 \
+    -e ROS_IP=$IP \
     --device /dev/dri \
     -v /etc/localtime:/etc/localtime:ro \
     -v $NVIDIA_LIB:/usr/local/nvidia/lib64 \
@@ -51,13 +57,6 @@ docker run --rm --name drcsim \
     -v /dev/log:/dev/log \
     -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    -v "/etc/localtime:/etc/localtime:ro" \
     --ulimit rtprio=99 \
-    --net=docker_bridge\
-    --ip=201.1.1.`expr $UID - 1000 + 10` \
     -it \
-    drcsim:$UID /bin/bash
-
-
-
-#--runtime=nvidia \
+    drcsim:$DUID /bin/bash

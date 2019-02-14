@@ -8,14 +8,17 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN cat /etc/resolv.conf
 RUN apt-get -y update && apt-get install -y sudo apt-utils
 
+ARG ip
+ENV IP=$ip
+RUN echo "IP is ${IP}"
 # Create a user
 RUN export uid=1000 gid=1000 && \
-    mkdir -p /home/whrl && \
-    echo "whrl:x:${uid}:${gid}:Whrl,,,:/home/whrl:/bin/bash" >> /etc/passwd && \
-    echo "whrl:x:${uid}:" >> /etc/group && \
-    echo "whrl ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/whrl && \
-    chmod 0440 /etc/sudoers.d/whrl && \
-    chown ${uid}:${gid} -R /home/whrl
+  mkdir -p /home/whrl && \
+  echo "whrl:x:${uid}:${gid}:Whrl,,,:/home/whrl:/bin/bash" >> /etc/passwd && \
+  echo "whrl:x:${uid}:" >> /etc/group && \
+  echo "whrl ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/whrl && \
+  chmod 0440 /etc/sudoers.d/whrl && \
+  chown ${uid}:${gid} -R /home/whrl
 
 USER whrl
 ENV HOME /home/whrl
@@ -56,13 +59,13 @@ RUN rosdep update
 
 # Create a catkin workspace
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-                  mkdir ~/kinetic_ws"
+  mkdir ~/kinetic_ws"
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-                  cd ~/kinetic_ws && catkin config --init --mkdirs && \
-                  cd src && \
-                  wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/master/atlas_gazebo_ws.yaml && \
-                  vcs import < atlas_gazebo_ws.yaml && cd .. && \
-                  rosdep install --from-paths src --ignore-src -r -y"
+  cd ~/kinetic_ws && catkin config --init --mkdirs && \
+  cd src && \
+  wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/master/atlas_gazebo_ws.yaml && \
+  vcs import < atlas_gazebo_ws.yaml && cd .. && \
+  rosdep install --from-paths src --ignore-src -r -y"
 
 #Install jdk8 with javafx support
 RUN sudo add-apt-repository -y ppa:webupd8team/java
@@ -78,15 +81,15 @@ RUN sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/default-java
 
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/install/share/drcsim/setup.sh' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/devel/setup.bash' >> ~/.bashrc"
-RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://201.1.1.10:11311' >> ~/.bashrc"
-RUN /bin/bash -c "echo 'export ROS_IP=201.1.1.10' >> ~/.bashrc"                 
+RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
+RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
 RUN /bin/bash -c "echo 'ulimit -s unlimited' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'ulimit -c unlimited'>> ~/.bashrc"
 RUN /bin/bash -c "echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export IHMC_SOURCE_LOCATION=$HOME/repository-group/ihmc-open-robotics-software'>> ~/.bashrc"
 
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-                  cd ~/kinetic_ws && catkin_make install"
+  cd ~/kinetic_ws && catkin_make install"
 
 RUN /bin/bash -c "source ~/.bashrc"
 
@@ -100,10 +103,10 @@ RUN cd ~/repository-group && git clone https://github.com/WPI-Humanoid-Robotics-
 RUN cd ~/repository-group/ihmc-open-robotics-software && git checkout gazebo_devel && ./gradlew
 
 RUN /bin/bash -c 'source ~/.bashrc && export ROS_MASTER_URI=http://localhost:11311 && \
-    export ROS_IP=127.0.0.1 && roslaunch ihmc_atlas_ros atlas_warmup_gradle_cache.launch'
+  export ROS_IP=127.0.0.1 && roslaunch ihmc_atlas_ros atlas_warmup_gradle_cache.launch'
 
 RUN sudo bash -c "touch /etc/ld.so.conf.d/nvidia.conf"
-    
+
 RUN sudo bash -c 'echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf'
 RUN sudo bash -c 'echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf'
 

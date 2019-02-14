@@ -83,31 +83,38 @@ bash runDrcsimDocker.sh
 
 5. Connect gazebo client on host machine (in a new terminal)
 ```bash
-GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient
+DUID=$((UID%256))
+IP=${IPADDR:-172.16.$DUID.$DUID}
+export GAZEBO_MASTER_URI=http://${IP}:11345  
+gzclient
 ```
 6. To run code on docker image export the following variables. You can add these to ~/.bashrc for ease of use.
 ```bash
-export ROS_MASTER_URI=http://201.1.1.10:11311
-export ROS_IP=201.1.0.1 # Confirm this from ifconfig results
+DUID=$((UID%256))
+IP=${IPADDR:-172.16.$DUID.$DUID}
+export ROS_MASTER_URI=http://${IP}:11311
+export ROS_IP=172.16.232.1 # Confirm this from ifconfig results
 ```
 
-7. To stop the docker run `docker stop drcsim`
+7. To stop the docker run `docker stop drcsim_${USER}`
 
 ### Useful Aliases
 ```bash
-alias source_dock="export ROS_MASTER_URI=http://201.1.1.10:11311 && \
-                  export ROS_IP=201.1.0.1 # Confirm this from ifconfig results"
+DUID=$((UID%256))
+export IP=${IPADDR:-172.16.$DUID.$DUID}
+alias source_dock="export ROS_MASTER_URI=http://${IP}:11311 && \
+                  export ROS_IP 172.16.232.1" # Confirm this from ifconfig results
 
-export DRCSIM_DOCKER_DIR="~/Documents/drcsim_docker" # change this based on your configuration
+export DRCSIM_DOCKER_DIR="~/drcsim_docker" # change this based on your configuration
 alias start_dock="cd $DRCSIM_DOCKER_DIR && bash runDrcsimDocker.sh"
-alias stop_dock="docker stop drcsim"
-alias gazebo_dock="GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient"
+alias stop_dock="docker stop drcsim_${USER}"
+alias gazebo_dock="GAZEBO_MASTER_URI=http://${IP}:11345 gzclient"
 ```
 
 ### Troubleshooting
 1. Gazebo client starts fine, but atlas model is missing.    
-**Solution**: You need atlas model resources on local machine to see atlas in gazebo client. Create a new workspace using atlas_gazebo_ws.yaml file and the instructions available (here)[https://github.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/blob/master/atlas_gazebo_ws.yaml]. Run catkin_make install and source install/share/drcsim/setup.sh and start gzclient from that terminal. you can modify the alias given above as `alias gazebo_dock="source ~/drcsim/install/share/drcsim/setup.sh && \
-                   GAZEBO_MASTER_URI=http://201.1.1.10:11345 gzclient"`
+**Solution**: You need atlas model resources on local machine to see atlas in gazebo client. Create a new workspace using atlas_gazebo_ws.yaml file and the instructions available [here](https://github.com/WPI-Humanoid-Robotics-Lab/atlas_workspace). Run catkin_make install and source install/share/drcsim/setup.sh and start gzclient from that terminal. you can modify the alias given above as `alias gazebo_dock="source ~/drcsim/install/share/drcsim/setup.sh && \
+                   GAZEBO_MASTER_URI=http://${IP}:11345 gzclient"`
 
 2. Camera and/or lidar topic are not available.
 **Solution**: Follow step 3 in instructions. 
