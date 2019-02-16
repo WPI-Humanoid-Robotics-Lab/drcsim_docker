@@ -65,6 +65,7 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   cd src && \
   wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/master/atlas_gazebo_ws.yaml && \
   vcs import < atlas_gazebo_ws.yaml && cd .. && \
+  rm -r ~/kinetic_ws/src/tough && \
   rosdep install --from-paths src --ignore-src -r -y"
 
 #Install jdk8 with javafx support
