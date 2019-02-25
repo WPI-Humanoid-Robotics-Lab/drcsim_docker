@@ -8,9 +8,6 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN cat /etc/resolv.conf
 RUN apt-get -y update && apt-get install -y sudo apt-utils
 
-ARG ip
-ENV IP=$ip
-RUN echo "IP is ${IP}"
 # Create a user
 RUN export uid=1000 gid=1000 && \
   mkdir -p /home/whrl && \
@@ -82,8 +79,6 @@ RUN sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/default-java
 
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/install/share/drcsim/setup.sh' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/devel/setup.bash' >> ~/.bashrc"
-RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
-RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
 RUN /bin/bash -c "echo 'ulimit -s unlimited' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'ulimit -c unlimited'>> ~/.bashrc"
 RUN /bin/bash -c "echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> ~/.bashrc"
@@ -124,4 +119,11 @@ RUN sudo mkdir -p /usr/lib/nvidia/
 RUN sudo apt-get -y update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install nvidia-384
 
 RUN sudo bash -c 'echo "org.gradle.jvmargs=-Xms4096m -Xmx4096m" > ~/.gradle/gradle.properties'
+RUN sudo rm -rf /var/lib/apt/lists/
+ARG ip
+ENV IP=$ip
+RUN echo "IP is ${IP}"
+RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
+RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
+
 CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '

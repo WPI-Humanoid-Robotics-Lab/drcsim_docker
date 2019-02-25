@@ -3,9 +3,9 @@
 DUID=$((UID%256))
 IP=${IPADDR:-172.16.$DUID.$DUID}
 
-if [[ "$(docker images -q drcsim:$DUID 2> /dev/null)" == "" ]]; then
-  docker build -t drcsim:$DUID --build-arg ip=$IP .
-fi
+# if [[ "$(docker images -q drcsim:$DUID 2> /dev/null)" == "" ]]; then
+docker build -t drcsim:$DUID --build-arg ip=$IP .
+# fi
 
 if [[ "$(docker network ls | grep docker_bridge_$DUID 2> /dev/null)" == "" ]]; then
   echo "creating network bridge for docker image"
