@@ -120,6 +120,7 @@ RUN sudo apt-get -y update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y ins
 
 RUN sudo bash -c 'echo "org.gradle.jvmargs=-Xms4096m -Xmx4096m" > ~/.gradle/gradle.properties'
 RUN sudo rm -rf /var/lib/apt/lists/
+RUN /bin/bash -c "echo export DISPLAY=:0 >> ~/.bashrc"
 ARG ip
 ENV IP=$ip
 RUN echo "IP is ${IP}"
