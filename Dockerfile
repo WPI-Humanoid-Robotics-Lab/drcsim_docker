@@ -40,8 +40,8 @@ RUN  sudo apt-get -y update && sudo apt-get install -y git \
   ros-kinetic-humanoid-localization ros-kinetic-multisense-ros \
   ros-kinetic-laser-assembler ros-kinetic-robot-self-filter \
   ros-kinetic-tf2-geometry-msgs ros-kinetic-joint-state-publisher \
-  ros-kinetic-octomap-server ros-kinetic-octomap \
-  ros-kinetic-joint-trajectory-controller \
+  ros-kinetic-octomap-server ros-kinetic-octomap ros-kinetic-gazebo-ros-control \
+  ros-kinetic-joint-trajectory-controller ros-kinetic-controller-manager \
   ros-kinetic-image-transport \
   ros-kinetic-joint-state-controller ros-kinetic-position-controllers \
   ros-kinetic-sbpl \
@@ -56,7 +56,7 @@ RUN rosdep update
 
 # Create a catkin workspace
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-  mkdir ~/kinetic_ws"
+  mkdir -p ~/kinetic_ws"
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   cd ~/kinetic_ws && catkin config --init --mkdirs && \
   cd src && \
@@ -64,6 +64,8 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   vcs import < atlas_gazebo_ws.yaml && cd .. && \
   rm -r ~/kinetic_ws/src/tough && \
   rosdep install --from-paths src --ignore-src -r -y"
+
+RUN git clone https://github.com/ninja777/urdf_controller_test.git ~/kinetic_ws/src/reflex_hand_model
 
 #Install jdk8 with javafx support
 RUN sudo add-apt-repository -y ppa:webupd8team/java
