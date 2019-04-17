@@ -56,7 +56,7 @@ RUN rosdep update
 
 # Create a catkin workspace
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-  mkdir -p ~/kinetic_ws"
+  mkdir ~/kinetic_ws"
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   cd ~/kinetic_ws && catkin config --init --mkdirs && \
   cd src && \
@@ -65,7 +65,7 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   rm -r ~/kinetic_ws/src/tough && \
   rosdep install --from-paths src --ignore-src -r -y"
 
-RUN git clone https://github.com/ninja777/urdf_controller_test.git ~/kinetic_ws/src/reflex_hand_model
+#RUN git clone https://github.com/ninja777/urdf_controller_test.git ~/kinetic_ws/src/reflex_hand_model
 
 #Install jdk8 with javafx support
 RUN sudo add-apt-repository -y ppa:webupd8team/java
