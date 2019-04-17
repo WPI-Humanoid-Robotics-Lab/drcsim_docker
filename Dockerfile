@@ -49,7 +49,9 @@ RUN  sudo apt-get -y update && sudo apt-get install -y git \
   ros-kinetic-multisense-ros ros-kinetic-robot-self-filter ros-kinetic-octomap \
   ros-kinetic-octomap-msgs ros-kinetic-octomap-ros ros-kinetic-gridmap-2d \
   software-properties-common python-software-properties debconf-i18n \
-  ros-kinetic-stereo-image-proc python-vcstool python-catkin-tools ros-kinetic-ros-base 
+  ros-kinetic-stereo-image-proc python-vcstool python-catkin-tools ros-kinetic-ros-base \
+  openjdk-8-jdk openjfx
+
 
 RUN sudo rosdep init
 RUN rosdep update 
@@ -68,22 +70,22 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
 #RUN git clone https://github.com/ninja777/urdf_controller_test.git ~/kinetic_ws/src/reflex_hand_model
 
 #Install jdk8 with javafx support
-RUN sudo add-apt-repository -y ppa:webupd8team/java
-RUN sudo apt-get update
-RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
-RUN sudo apt-get install -y oracle-java8-installer && sudo rm -rf /var/lib/apt/lists/
+#RUN sudo add-apt-repository -y ppa:webupd8team/java
+#RUN sudo apt-get update
+#RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
+#RUN sudo apt-get install -y oracle-java8-installer && sudo rm -rf /var/lib/apt/lists/
 #
 ##set default java to version 8
-RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle/' >> ~/.bashrc
+RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/' >> ~/.bashrc
 #RUN sudo rm /usr/lib/jvm/default-java
-RUN sudo ln -s /usr/lib/jvm/java-8-oracle /usr/lib/jvm/default-java
+RUN sudo ln -s /usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/default-java
 
 
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/install/share/drcsim/setup.sh' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'source ~/kinetic_ws/devel/setup.bash' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'ulimit -s unlimited' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'ulimit -c unlimited'>> ~/.bashrc"
-RUN /bin/bash -c "echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> ~/.bashrc"
+RUN /bin/bash -c "echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export IHMC_SOURCE_LOCATION=$HOME/repository-group/ihmc-open-robotics-software'>> ~/.bashrc"
 
 RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
@@ -119,7 +121,6 @@ ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 COPY ./keyboard /etc/default/keyboard
 RUN sudo mkdir -p /usr/lib/nvidia/
 RUN sudo apt-get -y update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install nvidia-384
-
 RUN sudo bash -c 'echo "org.gradle.jvmargs=-Xms4096m -Xmx4096m" > ~/.gradle/gradle.properties'
 RUN sudo rm -rf /var/lib/apt/lists/
 RUN /bin/bash -c "echo export DISPLAY=:0 >> ~/.bashrc"
