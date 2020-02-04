@@ -57,7 +57,7 @@ docker run --rm --name drcsim_${USER} \
     -v /dev/log:/dev/log \
     -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    --ulimit rtprio=99 \
+    --ulimit rtprio=99 -it\
     drcsim:$DUID
 
 

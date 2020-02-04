@@ -32,7 +32,7 @@ RUN sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc
 RUN sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
 
 # Install Dependencies 
-RUN  sudo apt-get -y update && sudo apt-get install -y git \
+RUN  sudo apt-get -y update && sudo apt-get install -y --allow-unauthenticated git \
   g++ vim nano wget  ca-certificates  ssh ros-kinetic-pcl-ros \
   x11vnc xvfb icewm lxpanel iperf xz-utils cmake screen terminator konsole\ 
   ros-kinetic-pcl-conversions ros-kinetic-moveit \
@@ -64,8 +64,9 @@ RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
   cd src && \
   wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/atlas_workspace/master/atlas_gazebo_ws.yaml && \
   vcs import < atlas_gazebo_ws.yaml && cd .. && \
-  rm -r ~/kinetic_ws/src/tough && \
-  rosdep install --from-paths src --ignore-src -r -y"
+  rm -rf ~/kinetic_ws/src/tough"
+
+RUN cd ~/kinetic_ws && rosdep install --from-paths src --ignore-src -r -y
 
 #RUN git clone https://github.com/ninja777/urdf_controller_test.git ~/kinetic_ws/src/reflex_hand_model
 
@@ -88,8 +89,11 @@ RUN /bin/bash -c "echo 'ulimit -c unlimited'>> ~/.bashrc"
 RUN /bin/bash -c "echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export IHMC_SOURCE_LOCATION=$HOME/repository-group/ihmc-open-robotics-software'>> ~/.bashrc"
 
-RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && \
-  cd ~/kinetic_ws && catkin_make install"
+RUN /bin/bash -c "source /opt/ros/kinetic/setup.bash && source ~/.bashrc"
+
+RUN sudo apt install -y --allow-unauthenticated ros-kinetic-effort-controllers ros-kinetic-camera-info-manager ros-kinetic-gazebo-plugins
+
+RUN source ~/.bashrc && cd ~/kinetic_ws && catkin_make install
 
 RUN /bin/bash -c "source ~/.bashrc"
 
@@ -130,4 +134,4 @@ RUN echo "IP is ${IP}"
 RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
 
-CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
+# CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
