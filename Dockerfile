@@ -130,4 +130,7 @@ RUN echo "IP is ${IP}"
 RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
 
+RUN cd ~ && mkdir -p .ihmc/lib/openh264-1.7.0-64
+RUN cd ~/.ihmc/lib/openh264-1.7.0-64 && wget https://github.com/WPI-Humanoid-Robotics-Lab/drcsim_docker/raw/rbe-595/openh264-1.7.0-64/libihmcVideoCodecs.so.20171019203925 https://github.com/WPI-Humanoid-Robotics-Lab/drcsim_docker/raw/rbe-595/openh264-1.7.0-64/libopenh264.so.4
+
 CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
