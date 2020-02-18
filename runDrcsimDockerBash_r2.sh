@@ -16,12 +16,13 @@ echo "running drcsim 0.11 docker container"
 
 # Gazebo won't start gpurayplugin without display
 XAUTH=/tmp/.docker.xauth
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 if [ ! -f /tmp/.docker.xauth ]
 then
   export XAUTH=/tmp/.docker.xauth
-  xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+  xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 fi
+echo "Display is currently $DISPLAY"
 DISPLAY="${DISPLAY:-:0}"
 
 # Use lspci to check for the presence of an nvidia graphics card
@@ -42,7 +43,7 @@ fi
 printf "IP address is $IP \nROS master URI : http://$IP:11311 \nGazebo master URI : http://$IP:11345\n"
 
 docker run --rm --name drcsim_${USER} \
-    -e DISPLAY=unix$DISPLAY \
+    -e DISPLAY=$DISPLAY \
     --net=docker_bridge_$DUID \
     --ip=$IP \
     -e XAUTHORITY=/tmp/.docker.xauth \
@@ -55,7 +56,7 @@ docker run --rm --name drcsim_${USER} \
     -v $NVIDIA_BIN:/usr/local/nvidia/bin \
     -v $NVIDIA_LIB32:/usr/local/nvidia/lib \
     -v /dev/log:/dev/log \
-    -v "/tmp/.docker.xauth:/tmp/.docker.xauth" \
+    -v "$XAUTHORITY:/tmp/.docker.xauth:rw" \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
     --ulimit rtprio=99 \
     -it \

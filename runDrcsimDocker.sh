@@ -16,11 +16,12 @@ echo "running drcsim 0.11 docker container"
 
 # Gazebo won't start gpurayplugin without display
 XAUTH=/tmp/.docker.xauth
-xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/'
+xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 if [ ! -f /tmp/.docker.xauth ]
 then
   export XAUTH=/tmp/.docker.xauth
-  xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+  xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 fi
 DISPLAY="${DISPLAY:-:0}"
 

@@ -134,4 +134,6 @@ RUN echo "IP is ${IP}"
 RUN /bin/bash -c "echo 'export ROS_MASTER_URI=http://${IP}:11311' >> ~/.bashrc"
 RUN /bin/bash -c "echo 'export ROS_IP=${IP}' >> ~/.bashrc"                 
 
-# CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
+RUN sudo apt-get -y install xclock
+
+CMD /bin/bash -c 'source ~/.bashrc && roslaunch ihmc_atlas_ros ihmc_atlas_gazebo.launch gzname:="gzserver" '
