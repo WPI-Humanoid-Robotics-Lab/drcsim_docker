@@ -112,11 +112,18 @@ alias gazebo_dock="GAZEBO_MASTER_URI=http://${IP}:11345 gzclient"
 ```
 
 ### Troubleshooting
-1. Gazebo client starts fine, but atlas model is missing.    
+1. If docker doesn't start without errors, please run these commands.
+```bash
+cd ~/drcsim_docker
+chmod +x fix_docker.sh 
+./fix_docker.sh 
+````
+
+2. Gazebo client starts fine, but atlas model is missing.    
 **Solution**: You need atlas model resources on local machine to see atlas in gazebo client. Create a new workspace using atlas_gazebo_ws.yaml file and the instructions available [here](https://github.com/WPI-Humanoid-Robotics-Lab/atlas_workspace). Run catkin_make install and source install/share/drcsim/setup.sh and start gzclient from that terminal. you can modify the alias given above as `alias gazebo_dock="source ~/drcsim/install/share/drcsim/setup.sh && \
                    GAZEBO_MASTER_URI=http://${IP}:11345 gzclient"`
 
-2. Camera and/or lidar topic are not available.
+3. Camera and/or lidar topic are not available.
 **Solution**: Follow step 3 in instructions. 
 
 
