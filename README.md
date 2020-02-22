@@ -114,7 +114,7 @@ alias gazebo_dock="GAZEBO_MASTER_URI=http://${IP}:11345 gzclient"
 ### Troubleshooting
 1. If docker doesn't start without errors, please run these commands.
 ```bash
-cd ~/drcsim_docker
+cd 
 wget https://raw.githubusercontent.com/WPI-Humanoid-Robotics-Lab/drcsim_docker/rbe-595/fix_docker.sh
 chmod +x fix_docker.sh 
 ./fix_docker.sh 
