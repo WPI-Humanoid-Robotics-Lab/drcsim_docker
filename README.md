@@ -46,13 +46,19 @@ sudo apt-get install nvidia-docker2
 sudo pkill -SIGHUP dockerd
 ```
 3. Setup environment variables for NVIDIA binaries and libraries. If these variables are not set correct, pointcloud from lidar wont be visible
+
 ```bash
 # find out the version of nvidia drivers installed
 glxinfo | grep "OpenGL core profile version" 
 # output of this should be something similar to 
 # OpenGL core profile version string: 4.5.0 NVIDIA 384.130
 # In this case, the driver version is 384.130
-
+```
+- if glxinfo is not found
+```bash
+sudo apt-get install mesa-utils 
+```
+```bash
 # search for the bin, lib and lib32 directories
 dpkg -L nvidia-384 # change nvidia-384 to the major number of installed version
 # based on the output, relevant directories on my machine are /usr/lib/nvidia-384/bin, /usr/lib/nvidia-384, and /usr/lib32/nvidia-384
