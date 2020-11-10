@@ -50,7 +50,8 @@ RUN  sudo apt-get -y update && sudo apt-get install -y git \
   ros-kinetic-octomap-msgs ros-kinetic-octomap-ros ros-kinetic-gridmap-2d \
   software-properties-common python-software-properties debconf-i18n \
   ros-kinetic-stereo-image-proc python-vcstool python-catkin-tools ros-kinetic-ros-base \
-  openjdk-8-jdk openjfx
+  openjdk-8-jdk openjfx ros-kinetic-effort-controllers ros-kinetic-camera-info-manager \
+  ros-kinetic-gazebo-plugins ros-kinetic-fiducials ros-kinetic-moveit-visual-tools
 
 
 RUN sudo rosdep init
